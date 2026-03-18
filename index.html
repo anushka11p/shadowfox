@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link rel="stylesheet" href="styles.css"/>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Anushka Prasad — Portfolio</title>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="style.css"/>
+</head>
+<body>
+ 
+  <nav>
+    <span class="nav-logo">Anushka.</span>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#experiences">Experience</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#skills">Skills</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+ 
+  <div id="about-slot"></div>
+  <div id="experience-slot"></div>
+  <div id="projects-slot"></div>
+  <div id="skills-slot"></div>
+  <div id="contact-slot"></div>
+ 
+  <footer>Anushka Prasad, Built with love</footer>
+ 
+  <script>
+    async function loadSection(file, slotId) {
+      const res = await fetch(file);
+      const html = await res.text();
+      document.getElementById(slotId).innerHTML = html;
+    }
+ 
+    Promise.all([
+      loadSection('about.html',      'about-slot'),
+      loadSection('projects.html',   'projects-slot'),
+      loadSection('skills.html',     'skills-slot'),
+      loadSection('experience.html', 'experience-slot'),
+      loadSection('contact.html',    'contact-slot'),
+    ]).then(() => {
+      const els = document.querySelectorAll('.fade-in');
+      const obs = new IntersectionObserver((entries) => {
+        entries.forEach((e, i) => {
+          if (e.isIntersecting) {
+            setTimeout(() => e.target.classList.add('visible'), i * 80);
+            obs.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.12 });
+      els.forEach(el => obs.observe(el));
+    });
+  </script>
+ 
+</body>
+</html>
