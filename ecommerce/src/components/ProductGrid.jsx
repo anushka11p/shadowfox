@@ -1,14 +1,16 @@
 import React, { useState } from 'react'
 import { products } from '../data/products'
 
-export default function ProductGrid({ onAddToCart }) {
-  const [activeFilter, setActiveFilter] = useState('all')
+export default function ProductGrid({ onAddToCart, activeFilter, setActiveFilter }) {
   const [maxPrice, setMaxPrice] = useState(300)
   const [sortOrder, setSortOrder] = useState('default')
 
-  let filtered = products.filter(p =>
-    (activeFilter === 'all' || p.category === activeFilter) && p.price <= maxPrice
-  )
+  let filtered = products.filter(p => {
+    if (activeFilter === 'sale') return p.badge === 'sale' && p.price <= maxPrice
+    if (activeFilter === 'new') return p.badge === 'new' && p.price <= maxPrice
+    return (activeFilter === 'all' || p.category === activeFilter) && p.price <= maxPrice
+  })
+
   if (sortOrder === 'price-asc') filtered.sort((a, b) => a.price - b.price)
   else if (sortOrder === 'price-desc') filtered.sort((a, b) => b.price - a.price)
   else if (sortOrder === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name))
@@ -22,14 +24,13 @@ export default function ProductGrid({ onAddToCart }) {
         </h2>
         <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.95)' }}>{filtered.length} products</span>
       </div>
-{/* name */}
-      
+
       <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e8e2d6', marginBottom: '3rem', flexWrap: 'wrap' }}>
         <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1.5rem', borderRight: '1px solid #e8e2d6' }}>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(241, 224, 196, 0.95)', marginRight: '1rem' }}>Category</span>
           {['all', 'tops', 'bottoms', 'outerwear', 'accessories'].map(cat => (
             <button key={cat} onClick={() => setActiveFilter(cat)} style={{
-              background: 'none', border: 'none', borderRight: '1px solidrgb(241, 238, 231)',
+              background: 'none', border: 'none',
               color: activeFilter === cat ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.95)',
               fontWeight: activeFilter === cat ? 500 : 300,
               padding: '0.3rem 0.9rem', fontFamily: 'DM Sans, sans-serif',
@@ -56,7 +57,6 @@ export default function ProductGrid({ onAddToCart }) {
         </div>
       </div>
 
-      {/* GRID */}
       {filtered.length === 0 ? (
         <p style={{ textAlign: 'center', padding: '5rem', color: '#b0a898', fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.3rem' }}>No pieces found — try adjusting your filters.</p>
       ) : (
@@ -73,7 +73,7 @@ export default function ProductGrid({ onAddToCart }) {
                 </div>
               </div>
               <div style={{ fontSize: '0.65rem', letterSpacing: '0.15em', textTransform: 'uppercase', color: 'rgba(238, 176, 204, 0.95)', marginBottom: '0.3rem' }}>{p.category}</div>
-              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', marginBottom: '0.4rem',color:'white' }}>{p.name}</div>
+              <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.05rem', marginBottom: '0.4rem', color: 'white' }}>{p.name}</div>
               <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', fontSize: '0.85rem' }}>
                 <span style={{ color: 'rgba(238, 176, 204, 0.95)' }}>₹{p.price}</span>
                 {p.oldPrice && <span style={{ textDecoration: 'line-through', color: 'rgba(238, 176, 204, 0.95)' }}>₹{p.oldPrice}</span>}
@@ -85,4 +85,4 @@ export default function ProductGrid({ onAddToCart }) {
       )}
     </section>
   )
-} {/* category */}
+}

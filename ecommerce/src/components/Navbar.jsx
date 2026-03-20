@@ -1,19 +1,13 @@
-
 import React from 'react'
- 
-const scrollTo = (id) => {
-  const el = document.getElementById(id)
-  if (el) el.scrollIntoView({ behavior: 'smooth' })
-}
- 
+
 const navLinks = [
-  { label: 'Collections', id: 'shop' },
-  { label: 'New In',      id: 'new-in' },
-  { label: 'Sale',        id: 'sale' },
-  { label: 'About',       id: 'about' },
+  { label: 'Collections', id: 'shop',   filter: 'all'  },
+  { label: 'New In',      id: 'shop',   filter: 'new'  },
+  { label: 'Sale',        id: 'shop',   filter: 'sale' },
+  { label: 'About',       id: 'about',  filter: null   },
 ]
- 
-export default function Navbar({ cartCount, onCartOpen }) {
+
+export default function Navbar({ cartCount, onCartOpen, onNavClick }) {
   return (
     <nav style={{
       position: 'sticky', top: 0, zIndex: 100,
@@ -25,12 +19,12 @@ export default function Navbar({ cartCount, onCartOpen }) {
       fontFamily: 'DM Sans, sans-serif'
     }}>
       <div style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '1.6rem', fontWeight: 300, letterSpacing: '0.5em', color: '#e8ddd0' }}>Flawless</div>
- 
+
       <div style={{ display: 'flex', gap: '3rem' }}>
-        {navLinks.map(({ label, id }) => (
+        {navLinks.map(({ label, id, filter }) => (
           <button
-            key={id}
-            onClick={() => scrollTo(id)}
+            key={label}
+            onClick={() => onNavClick(id, filter)}
             style={{
               background: 'none', border: 'none', cursor: 'pointer',
               color: '#A2887B', fontSize: '0.78rem',
@@ -42,7 +36,7 @@ export default function Navbar({ cartCount, onCartOpen }) {
           </button>
         ))}
       </div>
- 
+
       <button onClick={onCartOpen} style={{
         background: 'none', border: '1px solid #e8e2d6', color: '#7a6e5f',
         padding: '0.5rem 1.2rem', fontFamily: 'DM Sans, sans-serif',
