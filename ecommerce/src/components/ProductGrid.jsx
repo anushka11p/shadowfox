@@ -1,9 +1,23 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { products } from '../data/products'
 
 export default function ProductGrid({ onAddToCart, activeFilter, setActiveFilter }) {
   const [maxPrice, setMaxPrice] = useState(300)
   const [sortOrder, setSortOrder] = useState('default')
+  const [cols, setCols] = useState(4)
+
+  useEffect(() => {
+    function updateCols() {
+      const w = window.innerWidth
+      if (w < 480) setCols(1)
+      else if (w < 768) setCols(2)
+      else if (w < 1024) setCols(3)
+      else setCols(4)
+    }
+    updateCols()
+    window.addEventListener('resize', updateCols)
+    return () => window.removeEventListener('resize', updateCols)
+  }, [])
 
   let filtered = products.filter(p => {
     if (activeFilter === 'sale') return p.badge === 'sale' && p.price <= maxPrice
@@ -16,36 +30,38 @@ export default function ProductGrid({ onAddToCart, activeFilter, setActiveFilter
   else if (sortOrder === 'name-asc') filtered.sort((a, b) => a.name.localeCompare(b.name))
   else if (sortOrder === 'rating') filtered.sort((a, b) => b.rating - a.rating)
 
+  const isMobile = cols <= 2
+
   return (
-    <section id="shop" style={{ padding: '4rem', borderTop: 'rgba(255, 255, 255, 0.95)', background: '#6b0f1a' }}>
+    <section id="shop" style={{ padding: isMobile ? '2rem 1rem' : '4rem', borderTop: 'rgba(255, 255, 255, 0.95)', background: '#6b0f1a' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: '2.5rem' }}>
-        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: '2rem', fontWeight: 300 }}>
+        <h2 style={{ fontFamily: 'Cormorant Garamond, serif', fontSize: isMobile ? '1.5rem' : '2rem', fontWeight: 300 }}>
           All <em style={{ fontStyle: 'italic', color: 'rgba(236, 193, 230, 0.95)' }}>Pieces</em>
         </h2>
         <span style={{ fontSize: '0.75rem', color: 'rgba(255, 255, 255, 0.95)' }}>{filtered.length} products</span>
       </div>
 
-      <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #e8e2d6', marginBottom: '3rem', flexWrap: 'wrap' }}>
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1.5rem', borderRight: '1px solid #e8e2d6' }}>
-          <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(241, 224, 196, 0.95)', marginRight: '1rem' }}>Category</span>
+      <div style={{ display: 'flex', flexDirection: isMobile ? 'column' : 'row', alignItems: isMobile ? 'flex-start' : 'center', border: '1px solid #e8e2d6', marginBottom: '3rem', flexWrap: 'wrap' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1rem', borderRight: isMobile ? 'none' : '1px solid #e8e2d6', borderBottom: isMobile ? '1px solid #e8e2d6' : 'none', flexWrap: 'wrap', gap: '0.2rem' }}>
+          <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(241, 224, 196, 0.95)', marginRight: '0.5rem' }}>Category</span>
           {['all', 'tops', 'bottoms', 'outerwear', 'accessories'].map(cat => (
             <button key={cat} onClick={() => setActiveFilter(cat)} style={{
               background: 'none', border: 'none',
-              color: activeFilter === cat ? 'rgba(255, 255, 255, 0.95)' : 'rgba(255, 255, 255, 0.95)',
+              color: 'rgba(255, 255, 255, 0.95)',
               fontWeight: activeFilter === cat ? 500 : 300,
-              padding: '0.3rem 0.9rem', fontFamily: 'DM Sans, sans-serif',
+              padding: '0.3rem 0.6rem', fontFamily: 'DM Sans, sans-serif',
               fontSize: '0.75rem', letterSpacing: '0.08em', cursor: 'pointer', textTransform: 'uppercase'
             }}>{cat}</button>
           ))}
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1.5rem', borderRight: 'rgba(255, 255, 255, 0.95)', gap: '0.8rem' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1rem', borderBottom: isMobile ? '1px solid #e8e2d6' : 'none', gap: '0.8rem' }}>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: 'rgba(255, 255, 255, 0.95)' }}>Price</span>
           <input type="range" min="0" max="300" value={maxPrice} onChange={e => setMaxPrice(Number(e.target.value))} style={{ width: '100px', accentColor: 'rgba(255, 255, 255, 0.95)' }} />
           <span style={{ fontSize: '0.72rem', color: 'rgba(255, 255, 255, 0.95)', minWidth: '55px' }}>Up to ₹{maxPrice}</span>
         </div>
 
-        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1.5rem', gap: '1rem', marginLeft: 'auto' }}>
+        <div style={{ display: 'flex', alignItems: 'center', padding: '0.8rem 1rem', gap: '1rem', marginLeft: isMobile ? 0 : 'auto' }}>
           <span style={{ fontSize: '0.65rem', letterSpacing: '0.2em', textTransform: 'uppercase', color: '#b0a898' }}>Sort</span>
           <select onChange={e => setSortOrder(e.target.value)} style={{ background: 'none', border: 'none', fontFamily: 'DM Sans, sans-serif', fontSize: '0.75rem', color: 'rgba(255, 253, 254, 0.95)', cursor: 'pointer', outline: 'none', textTransform: 'uppercase' }}>
             <option value="default">Featured</option>
@@ -60,7 +76,7 @@ export default function ProductGrid({ onAddToCart, activeFilter, setActiveFilter
       {filtered.length === 0 ? (
         <p style={{ textAlign: 'center', padding: '5rem', color: '#b0a898', fontFamily: 'Cormorant Garamond, serif', fontStyle: 'italic', fontSize: '1.3rem' }}>No pieces found — try adjusting your filters.</p>
       ) : (
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4, 1fr)', gap: '1.5rem' }}>
+        <div style={{ display: 'grid', gridTemplateColumns: `repeat(${cols}, 1fr)`, gap: isMobile ? '1rem' : '1.5rem' }}>
           {filtered.map(p => (
             <div key={p.id} style={{ cursor: 'pointer' }}>
               <div style={{ aspectRatio: '3/4', background: '#f4f0e8', border: '1px solid #e8e2d6', marginBottom: '1rem', position: 'relative', overflow: 'hidden' }}>
